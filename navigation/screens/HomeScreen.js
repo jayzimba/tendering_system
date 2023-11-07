@@ -48,9 +48,9 @@ export default function HomeScreen({ navigation }) {
     setSearchText(text);
     const filtered = Tenders.filter(
       (item) =>
-        item.name.toLowerCase().includes(text.toLowerCase()) ||
-        item.title.toLowerCase().includes(text.toLowerCase()) ||
-        item.description.toLowerCase().includes(text.toLowerCase())
+        item.owner_name.toLowerCase().includes(text.toLowerCase()) ||
+        item.tender_title.toLowerCase().includes(text.toLowerCase()) ||
+        item.tender_description.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredData(filtered);
   };
@@ -267,7 +267,7 @@ export default function HomeScreen({ navigation }) {
         ) : (
           <FlatList
             data={filteredData}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.tender_id.toString()}
             horizontal={false}
             renderItem={({ item }) => (
               <View>
