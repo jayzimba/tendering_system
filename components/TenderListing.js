@@ -11,29 +11,14 @@ import {
   Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
+  AntDesign,
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 const TenderListing = (props) => {
   const navigation = useNavigation();
 
   return (
-    <TouchableOpacity
-      onPress={() =>
-        navigation.navigate("Details", {
-          id: props.id,
-          title: props.tile,
-          description: props.description,
-          charge_per_hour: props.charge_per_hour,
-          status: props.status,
-          created_date: props.created_date,
-          owner_name: props.name,
-          owner_contact: props.contact,
-          owner_email: props.email,
-          owner_address: props.address,
-          owner_citys: props.city,
-          proffession: props.prof_name,
-        })
-      }
+    <View
       style={{ borderWidth: 0.5, borderColor: "#ededed", marginBottom: 30 }}
     >
       <View
@@ -51,7 +36,7 @@ const TenderListing = (props) => {
           }}
         >
           <ImageBackground
-            source={require("../assets/carpenter.jpg")}
+            source={require("../assets/images/tender.jpg")}
             resizeMethod="resize"
             imageStyle={{ borderRadius: 5 }}
             style={{
@@ -61,10 +46,20 @@ const TenderListing = (props) => {
             }}
           />
           <View>
-            <Text style={{ fontWeight: "500" }}>{props.title}</Text>
-            <Text style={{ color: "gray" }}>22, Kalewa Rd</Text>
-            <Text style={{ color: "gray" }}>Northrise</Text>
-            <Text style={{ color: "gray" }}>Ndola, CopperBelt</Text>
+            <Text style={{ fontWeight: "500" }}>{props.tender_title}</Text>
+            <Text style={{ color: "gray" }}>{props.owner_city}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <AntDesign name="calendar" size={14} color="black" />
+              <Text style={{ color: "gray", marginStart: 5 }}>
+                {props.tender_created_date}
+              </Text>
+            </View>
+
             <Text style={{ color: "gray" }}>
               per hour ZMW {props.charge_per_hour}
             </Text>
@@ -89,7 +84,7 @@ const TenderListing = (props) => {
           Carpetry and enterior designing
         </Text>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
