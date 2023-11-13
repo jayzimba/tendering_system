@@ -17,8 +17,11 @@ import { TouchableOpacity } from "react-native";
 import { FlatList } from "react-native";
 import TenderListing from "../../../components/TenderListing.js";
 import { ScrollView } from "react-native";
+import { useSelector } from "react-redux";
 
 export default function HomeScreenInner({ navigation }) {
+  const customerData = useSelector((state) => state.customer);
+
   const [searchText, setSearchText] = useState("");
   const [Tenders, setTenders] = React.useState([]);
   const [filteredData, setFilteredData] = React.useState([]);
@@ -30,9 +33,20 @@ export default function HomeScreenInner({ navigation }) {
   }, []);
 
   const fetchTenders = async () => {
+    var formdata = new FormData();
+
+    formdata.append("customerID", customerData.id);
+
+    var requestOptions = {
+      method: "POST",
+      body: formdata,
+      redirect: "follow",
+    };
+
     try {
       const response = await fetch(
-        "https://www.pezabond.com/chance/fetchAllTenders.php"
+        "https://www.pezabond.com/chance/fetchAllTenders.php",
+        requestOptions
       );
       const data = await response.json();
       setTenders(data);
@@ -66,6 +80,9 @@ export default function HomeScreenInner({ navigation }) {
       {/* Header Section */}
       <View>
         <Text style={{ fontWeight: "bold", fontSize: 22 }}>Find Tenders</Text>
+        <Text style={{ fontWeight: "400", fontSize: 14 }}>
+          Welcome {customerData.name}
+        </Text>
         {/* Search Area */}
         <View
           style={{
@@ -224,7 +241,7 @@ export default function HomeScreenInner({ navigation }) {
               />
 
               <Text style={{ color: "gray", marginStart: 20 }}>
-                Completed Tenders
+                Closed Tenders
               </Text>
             </View>
             <TouchableOpacity

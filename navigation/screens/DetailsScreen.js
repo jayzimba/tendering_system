@@ -12,16 +12,23 @@ import { ScrollView } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import colors from "./../../assets/Theme.js/colors";
 import { ActivityIndicator } from "react-native";
+import { useSelector } from "react-redux";
+import { Alert } from "react-native";
 
 export default function DetailsScreen({ navigation }) {
+  const customerData = useSelector((state) => state.customer);
+  const [customerID, setCustomerID] = React.useState(customerData.id);
   const [selectedCity, setSelectedCity] = React.useState(null);
   const [date, setDate] = React.useState(new Date());
-  const [tenderTtitle, setTenderTtitle] = React.useState("");
-  const [street, setStreet] = React.useState("");
-  const [name, setName] = React.useState("");
-  const [contact, setContact] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [upload, setUpload] = React.useState(false);
+  const [charge_per_hour, setCharge_per_hour] = React.useState(0);
+  const [tenderTitle, setTenderTitle] = React.useState("");
+  const [address, setStreet] = React.useState(
+    customerData.address + ", " + customerData.city
+  );
+  const [name, setName] = React.useState(customerData.name);
+  const [contact, setContact] = React.useState(customerData.contact);
+  const [email, setEmail] = React.useState(customerData.email);
+  const [loading, setLoading] = React.useState(false);
   const [tenderDescription, setTenderDescription] = React.useState("");
 
   const cities = [
@@ -33,6 +40,62 @@ export default function DetailsScreen({ navigation }) {
     label: "* Select your city...",
     value: null,
     color: "gray",
+  };
+
+  const uploadTender = async () => {
+    setLoading(true);
+
+    var customerIDPassed = customerID;
+    var title = tenderTitle;
+    var description = tenderDescription;
+    var chargePerHour = charge_per_hour;
+
+    if (title.length == 0 || description.length == 0) {
+      Alert.alert("Required Field Is Missing!");
+      this.setState({ loading: false });
+    } else {
+      var formdata = new FormData();
+      formdata.append("customerIDPassed", customerIDPassed);
+      formdata.append("title", title);
+      formdata.append("description", description);
+      formdata.append("chargePerHour", chargePerHour);
+
+      var headers = {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      };
+
+      var requestOptions = {
+        method: "POST",
+        body: formdata,
+        redirect: "follow",
+      };
+
+      fetch("https://www.pezabond.com/chance/uploadTender.php", requestOptions)
+        .then((Response) => Response.json())
+        .then((Response) => {
+          if (Response.success == true) {
+            Alert.alert(
+              "TENDER UPLOAD",
+              "your tender has been listed successfully"
+            );
+          } else {
+            Alert.alert(
+              "TENDER UPLOAD FAILED",
+              "We failed to upload your tender please try again"
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("ERROR:" + error);
+        })
+        .finally(() => {
+          setTenderTitle("");
+          setTenderDescription("");
+          setCharge_per_hour("");
+          setLoading(false);
+        });
+    }
   };
 
   return (
@@ -50,6 +113,7 @@ export default function DetailsScreen({ navigation }) {
       {/* name */}
       <TextInput
         placeholder="name"
+        value={name}
         onChangeText={(text) => setName(text)}
         style={{
           borderBottomWidth: 0.6,
@@ -67,6 +131,7 @@ export default function DetailsScreen({ navigation }) {
       {/* contact */}
       <TextInput
         placeholder="contact"
+        value={contact}
         onChangeText={(text) => setContact(text)}
         style={{
           borderBottomWidth: 0.6,
@@ -83,6 +148,7 @@ export default function DetailsScreen({ navigation }) {
       {/* email */}
       <TextInput
         placeholder="Email"
+        value={email}
         onChangeText={(text) => setEmail(text)}
         style={{
           borderBottomWidth: 0.6,
@@ -99,6 +165,7 @@ export default function DetailsScreen({ navigation }) {
       {/* street */}
       <TextInput
         placeholder="address"
+        value={address}
         onChangeText={(text) => setStreet(text)}
         style={{
           borderBottomWidth: 0.6,
@@ -112,35 +179,12 @@ export default function DetailsScreen({ navigation }) {
           paddingRight: 30,
         }}
       />
-      {/* city */}
-      <View
-        style={{
-          borderBottomWidth: 0.6,
-          borderColor: "black",
-          borderRadius: 8,
-          marginBottom: 10,
-        }}
-      >
-        <RNPickerSelect
-          placeholder={placeholder}
-          items={cities}
-          onValueChange={(value) => setSelectedCity(value)}
-          style={{
-            fontSize: 16,
-            paddingHorizontal: 10,
-            paddingVertical: 8,
-
-            color: "black",
-            paddingRight: 30,
-          }}
-          value={selectedCity}
-        />
-      </View>
 
       {/* tender Title */}
       <TextInput
         placeholder="Tender Title"
-        onChangeText={(text) => setTenderTtitle(text)}
+        value={tenderTitle}
+        onChangeText={(text) => setTenderTitle(text)}
         style={{
           borderBottomWidth: 0.6,
           borderColor: "black",
@@ -157,6 +201,7 @@ export default function DetailsScreen({ navigation }) {
       <TextInput
         placeholder="Description"
         multiline={true}
+        value={tenderDescription}
         onChangeText={(text) => setTenderDescription(text)}
         style={{
           borderWidth: 0.6,
@@ -172,6 +217,34 @@ export default function DetailsScreen({ navigation }) {
         }}
       />
 
+      {/* charge per hour */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginVertical: 20,
+        }}
+      >
+        <Text style={{ fontWeight: "bold", fontSize: 22 }}>ZMW</Text>
+        <TextInput
+          placeholder="charge per hours"
+          value={charge_per_hour}
+          keyboardType="number-pad"
+          onChangeText={(text) => setCharge_per_hour(text)}
+          style={{
+            borderBottomWidth: 0.6,
+            borderColor: "black",
+            borderRadius: 8,
+            marginBottom: 10,
+            fontSize: 18,
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            color: "black",
+            paddingRight: 30,
+          }}
+        />
+      </View>
+
       <TouchableOpacity
         style={{
           borderRadius: 5,
@@ -182,7 +255,7 @@ export default function DetailsScreen({ navigation }) {
           flexDirection: "row",
           marginVertical: 10,
         }}
-        onPress={() => setUpload(true)}
+        onPress={() => uploadTender()}
       >
         <MaterialIcons name="post-add" size={24} color="white" />
         <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>
@@ -190,7 +263,7 @@ export default function DetailsScreen({ navigation }) {
         </Text>
       </TouchableOpacity>
 
-      {upload && (
+      {loading && (
         <ActivityIndicator
           size={34}
           style={{ marginVertical: 10 }}

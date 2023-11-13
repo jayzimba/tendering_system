@@ -1,7 +1,7 @@
 // colors.js
 
 const colors = {
-  primary: "#00483A",
+  primary: "tomato",
   secondary: "#F78f1E",
   success: "#28A745",
   danger: "#DC3545",
@@ -13,6 +13,5 @@ const colors = {
   gray: "#343A40",
   black: "#000000",
 };
-
 
 export default colors;
